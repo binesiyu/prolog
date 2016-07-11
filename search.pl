@@ -19,3 +19,9 @@ route(Links,Current,Des):-
         route(PreLinks,Current,Next),
         sub(Next,Des),
         append(PreLinks,[Next],Links).
+        
+route_depth([],Current,Current).
+route_depth(Links,Current,Des):-
+        sub(Current,Next), %首先找到current的一个子节点next,
+        route_depth(PreLinks,Next,Des), %在寻找从next到目的节点Des的路由Prelinks,
+        Links = [Next|PreLinks].  %最终的路由表为next加上prelinks.
