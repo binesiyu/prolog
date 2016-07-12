@@ -1,0 +1,133 @@
+reduce(X+Y,R):-!,
+	reduce(X,X1),
+	reduce(Y,Y1),
+	plusr(X1,Y1,R).
+reduce(-(X,Y),R):-!,
+	reduce(X,X1),
+	reduce(Y,Y1),
+	minusr(X1,Y1,R).
+reduce(*(X,Y),R):-!,
+	reduce(X,X1),
+	reduce(Y,Y1),
+	multr(X1,Y1,R).
+reduce(/(X,Y),R):-!,
+	reduce(X,X1),
+	reduce(Y,Y1),
+	divr(X1,Y1,R).
+reduce(ln(X),R):-!,
+	reduce(X,X1),
+	lnr(X1,R).
+reduce(^(E,1),E):-!.
+reduce(R,R).
+
+%  CLAUSES FOR REDUCTION OF AN ADDITION EXPRESSION
+plusr(0,X,X):-!.
+
+plusr(X,0,X):-!.
+
+plusr(X,Y,Z):-integer(X),integer(Y),!,
+	Z is X+Y.
+	
+plusr(X,X,*(2,X)):-!.
+
+plusr(I*X,X,I1*X):-integer(I),!,
+	I1 is I+1.
+
+plusr(X,I*X,I1*X):-integer(I),!,
+	I1 is I+1.
+
+plusr(I1*X,I2*X,I3*X):-integer(I1),integer(I2),!,
+	I3 is I1+I2.
+
+plusr(integer(I),X,X+I):-!.
+
+plusr(X+I1,I2,X+I3):-
+	integer(I1),
+	integer(I2),
+	!,
+	I3 is I1+I2.
+
+plusr(X+I1,Y+I2,R+I3):-
+	integer(I1),
+	integer(I2),
+	!,
+	I3 is I1+I2,
+	plusr(X,Y,R).
+
+plusr(X,Y,Z):-
+	integer(X), 
+	X<0,
+	!,
+	T is -X,
+	minusr(T,Y,Z).
+
+plusr(Y,X,Z):-  
+	integer(X),
+	X<0,
+	!,
+	T is -X,
+	minusr(T,Y,Z).
+
+plusr(X+I,Y,R+I):-integer(I),!,
+	plusr(X,Y,R).
+
+plusr(X+Y,Y,X+2*Y):-!.
+plusr(X+I*Y,Y,X+I1*Y):-integer(I),!,I1 is I+1.
+plusr(X+I1*Y,I2*Y,X+I3*Y):-integer(I1),integer(I2),!,I3 is I1+I2.
+
+plusr(X+Y,X,2*X+Y):-!.
+plusr(I*X+Y,X,I1*X+Y):-integer(I),!,I1 is I+1.
+plusr(I1*X+Y,I2*X,I3*X+Y):-integer(I1),integer(I2),!,I3 is I1+I2.
+
+plusr(X,Y+X,2*X+Y):-!.
+plusr(X,Y+I1*X,I1*X+Y):-integer(I),!,I1 is I+1.
+plusr(I1*X,Y+I2*X,I3*X+Y):-integer(I1),integer(I2),!,I3 is I1+I2.
+
+plusr(X,Y,Z):-Z=X+Y.
+
+minusr(X,Y,Z):-integer(X),integer(Y),!,Z is X-Y.
+minusr(X,0,X):-!.
+minusr(X,X,0):-!.
+minusr(X,I,I1+X):-integer(I),!,I1 is -I.
+minusr(X,Y,X-Y).
+
+multr(X,Y,Z):-integer(X),integer(Y),!,Z is X*Y.
+multr(0,_,0):-!.
+multr(_,0,0):-!.
+multr(1,X,X):-!.
+multr(X,1,X):-!.
+multr(M,+(X,Y),+(X1,Y1)):-!,
+	multr(M,X,X1),multr(M,Y,Y1). 
+multr(M,-(X,Y),-(X1,Y1)):-!,
+	multr(M,X,X1),multr(M,Y,Y1). 
+multr(+(X,Y),M,+(X1,Y1)):-!,
+	multr(M,X,X1),multr(M,Y,Y1). 
+multr(-(X,Y),M,-(X1,Y1)):-!,
+	multr(M,X,X1),multr(M,Y,Y1). 
+multr(*(I1,X),I2,M1):-integer(I1),integer(I2),!,
+	I3 is I1*I2,
+	multr(I3,X,M1).
+multr(I1,*(I2,X),M1):-integer(I1),integer(I2),!,
+	I3 is I1*I2,
+	multr(I3,X,M1).
+multr(*(I1,X),*(I2,Y),*(I3,R)):-integer(I1),integer(I2),!,
+	I3 is I1*I2, 
+	multr(X,Y,R).
+multr(*(I,X),Y,*(I,R)):-integer(I),!,
+	multr(X,Y,R).
+multr(X,I,*(I,X)):-integer(I),!.
+multr(^(X,I1),^(X,I2),^(X,I3)):-integer(I1),integer(I2),!,
+	I3 is I1+I2.
+multr(X,^(X,I),^(X,I1)):-integer(I),!,
+	I1 is I+1.
+multr(^(X,I),X,^(X,I1)):-integer(I),!,
+	I1 is I+1.
+multr(X,X,^(X,2)):-!.
+multr(X,Y,X*Y).
+
+divr(0,_,0):-!.
+divr(X,1,X):-!.
+divr(X,Y,/(X,Y)).
+
+lnr(1,0):-!.
+lnr(X,ln(X)).
