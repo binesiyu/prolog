@@ -85,6 +85,7 @@ go:-                       % The main control loop
 do(solve):-solve,!.        % in this module
 do(manual):-manual,!.      % in this module
 do(help):-rub_help,!.      % in rubhelp
+do(seq):-seq,!.      % in rubhelp
 do(exit).                  % built-in predicate to exit
 
 banner:-
@@ -99,7 +100,34 @@ banner:-
   write('Stow, MA 01775 USA'),nl,
   write('Tel 508/897-7332, FAX 508/897-2784'),nl,
   write('e-mail amzi@world.std.com'),nl,nl.
-  
+
+disp_cub(_,[]):-true.
+disp_cub(V,S):-
+  wrfield(seq,V),
+  add_history(S),
+  pristine(G),                            % Start with the goal state
+  move_list(S,G,C),
+  cube_print(C).
+
+disp_seq:-
+    write('Seq'),nl,
+    seq(Name,Seq),
+    disp_cub(Name,Seq),
+    fail.
+disp_seq:-
+    write('S_r'),nl,
+    s_r(Name,Seq),
+    disp_cub(Name,Seq),
+    fail.
+disp_seq:-
+    write('Orientation'),nl,
+    orientation(Name,Seq),
+    disp_cub(Name,Seq),
+    fail.
+disp_seq:-true.
+
+seq:-disp_seq.
+
 % These predicates initialize the state to the goal state (ghoul),
 % and allow you to enter single moves.  They are intended to demonstrate the
 % effects of the various sequences used by the solve routines.
@@ -229,9 +257,9 @@ build_plan([H|T]) :-
 % the heuristics for the stage
 
 init_stage(N,Plan):-         % return list of target pieces for this stage
-  wrfield(stage,N),
   cnd(N,Cands),              % set up candidate moves used by search
   build_cand(Cands),
+  wrfield(stage,N),
   vw(N,V),                   % set up preferred view for stage
   set_view(V),
   pln(N,Plan),!.             % get list of target pieces
@@ -522,13 +550,22 @@ build_cands([]):- !.
 build_cands([V1|V2]):-
   can_seq(V1),
   assertz(cand(V1)),
+  %pristine(G),                            % Start with the goal state
+  %movep(V1,G,S),
+  %wrfield(seq,V1),
+  %cube_print(S),
   !,build_cands(V2).
 
 can_seq(M):-                      % if the search move is a sequence
   seq(M,S),                       % precompute it, so it isn't constantly
   variable(X),                    % redone during search.
   move_list(S,X,Y),
-  assertz(candmove(m(M,X,Y))), !.
+  assertz(candmove(m(M,X,Y))),
+  %pristine(G),                            % Start with the goal state
+  %movep(M,G,S),
+  %wrfield(seq,M),
+  %cube_print(S),
+  !.
 can_seq(_).
 
 % another classic

@@ -98,6 +98,7 @@ field(sequences, 'Sequences: ').
 field(end_disp, 'Enter q. to end').
 field(msg20, ' ').
 field(msg21, ' ').
+field(seq, '\nSeq:   ').
 
 m_disp(Menu):-
   menu(Menu, Choices),
@@ -125,6 +126,6 @@ m_ch(N, [H|T], X) :-
   NN is N - 1,
   m_ch(NN, T, X).
 
-menu(main, [solve, manual, help, exit]).
+menu(main, [solve, manual, help, seq,exit]).
 menu(solve, [random, manual, edit]).
 
