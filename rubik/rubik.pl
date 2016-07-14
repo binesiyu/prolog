@@ -106,7 +106,7 @@ disp_cub(V,S):-
   wrfield(seq,V),
   add_history(S),
   pristine(G),                            % Start with the goal state
-  move_list(S,G,C),
+  move_list(S,C,G),
   cube_print(C).
 
 disp_seq:-
