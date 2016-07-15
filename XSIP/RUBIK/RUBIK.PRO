@@ -12,7 +12,7 @@
 %  This program may be copied, modified and redistributed although proper
 %  acknowledgement is appreciated.
 %
-%  This implementation was done with Amzi! Prolog, also available
+%  This implementation was done with Cogent Prolog, also available
 %  from Amzi! inc.
 %
 %  This is the main module which contains the predicates for 
@@ -21,50 +21,50 @@
 %         solve mode, and
 %         utility functions.
 %
-% Note - The Amzi!/Prolog compiler supports modules.  The export declarations
+% Note - The Cogent/Prolog compiler supports modules.  The export declarations
 %        are for predicates defined in the current module which may be used
 %        by other modules.  The import declarations are for predicates 
 %        defined in other modules.
 
-:-export(main/0).
-:-export(append/3).
-:-export(get_flag/2).
-:-export(set_flag/2).
-:-export(error/1).
-:-export(reverse/2).
+:-export main/0.
+:-export append/3.
+:-export get_flag/2.
+:-export set_flag/2.
+:-export error/1.
+:-export reverse/2.
 
-:-import(add_history/1).     % rubhist
-:-import(cnd/2).             % rubdata
-:-import(cube_print/1).      % rubdisp
-:-import(get_color/1).       % rubedit
-:-import(pristine/1).        % rubdata
-:-import(rub_help/0).        % rubhelp
-:-import(m_disp/1).          % rubdisp
-:-import(m_choose/2).        % rubdisp
-:-import(move/3).            % rubmov
-:-import(orientation/2).     % rubdata
-:-import(pln/2).             % rubdata
-:-import(rdfield/2).         % rubdisp
-:-import(rdchar/2).          % rubdisp
-:-import(redit/1).           % rubedit
-:-import(rewrite/2).         % rubedit
-:-import(rot/3).             % rubmov
-:-import(seq/2).             % rubdata
-:-import(side_color/1).      % rubdata
-:-import(s_r/2).             % rubdata
-:-import(vw/2).              % rubdata 
-:-import(wrfield/2).         % rubdisp
-:-import(writec/2).          % rubdisp
+:-import add_history/1.     % rubhist
+:-import cnd/2.             % rubdata
+:-import cube_print/1.      % rubdisp
+:-import get_color/1.       % rubedit
+:-import pristine/1.        % rubdata
+:-import rub_help/0.        % rubhelp
+:-import m_disp/1.          % rubdisp
+:-import m_choose/2.        % rubdisp
+:-import move/3.            % rubmov
+:-import orientation/2.     % rubdata
+:-import pln/2.             % rubdata
+:-import rdfield/2.         % rubdisp
+:-import rdchar/2.          % rubdisp
+:-import redit/1.           % rubedit
+:-import rewrite/2.         % rubedit
+:-import rot/3.             % rubmov
+:-import seq/2.             % rubdata
+:-import side_color/1.      % rubdata
+:-import s_r/2.             % rubdata
+:-import vw/2.              % rubdata 
+:-import wrfield/2.         % rubdisp
+:-import writec/2.          % rubdisp
 
-:-import(logfile/1).                     % dynamic db
-:-import(impplan/1).        % dynamic db
-:-import(state/1).          % dynamic db
-:-import(crit/1).           % dynamic db
-:-import(ghoul/1).          % dynamic db
-:-import(sidecolor/1).      % dynamic db
-:-import(flag/2).                                % dynamic db
-:-import(cand/1).                                % dynamic db
-:-import(candmove/1).                    % dynamic db
+:-import logfile/1.			% dynamic db
+:-import impplan/1.        % dynamic db
+:-import state/1.          % dynamic db
+:-import crit/1.           % dynamic db
+:-import ghoul/1.          % dynamic db
+:-import sidecolor/1.      % dynamic db
+:-import flag/2.				% dynamic db
+:-import cand/1.				% dynamic db
+:-import candmove/1.			% dynamic db
 
 :-op(500,xfy,:).
 
@@ -85,48 +85,20 @@ go:-                       % The main control loop
 do(solve):-solve,!.        % in this module
 do(manual):-manual,!.      % in this module
 do(help):-rub_help,!.      % in rubhelp
-do(seq):-seq,!.      % in rubhelp
 do(exit).                  % built-in predicate to exit
 
 banner:-
   nl,nl,
-  write('Cube Solver II'),nl,
-  write('An illustrative Prolog program from'),nl,
-  write('Building Expert Systems in Prolog (Springer-Verlag) by Dennis Merritt'),nl,
-  write('implemented in Amzi! Prolog'),nl,nl,
-  write('For more information contact:'),nl,
-  write('Amzi! inc.'),nl,
-  write('40 Samuel Prescott Dr.'),nl,
-  write('Stow, MA 01775 USA'),nl,
-  write('Tel 508/897-7332, FAX 508/897-2784'),nl,
-  write('e-mail amzi@world.std.com'),nl,nl.
-
-disp_cub(_,[]):-true.
-disp_cub(V,S):-
-  wrfield(seq,V),
-  add_history(S),
-  pristine(G),                            % Start with the goal state
-  move_list(S,G,C),
-  cube_print(C).
-
-disp_seq:-
-    write('Seq'),nl,
-    seq(Name,Seq),
-    disp_cub(Name,Seq),
-    fail.
-disp_seq:-
-    write('S_r'),nl,
-    s_r(Name,Seq),
-    disp_cub(Name,Seq),
-    fail.
-disp_seq:-
-    write('Orientation'),nl,
-    orientation(Name,Seq),
-    disp_cub(Name,Seq),
-    fail.
-disp_seq:-true.
-
-seq:-disp_seq.
+  write($Cube Solver II$),nl,
+  write($An illustrative Prolog program from$),nl,
+  write($Building Expert Systems in Prolog (Springer-Verlag) by Dennis Merritt$),nl,
+  write($implemented in Cogent Prolog$),nl,nl,
+  write($For more information contact:$),nl,
+  write($Amzi! inc.$),nl,
+  write($40 Samuel Prescott Dr.$),nl,
+  write($Stow, MA 01775 USA$),nl,
+  write($Tel 508/897-7332, FAX 508/897-2784$),nl,
+  write($e-mail amzi@world.std.com$),nl,nl.
 
 % These predicates initialize the state to the goal state (ghoul),
 % and allow you to enter single moves.  They are intended to demonstrate the
@@ -186,7 +158,7 @@ solve:-
   m_disp(solve),              % solve submenu
   m_choose(solve,X),
   rdchar(stepmode,SM),
-  (SM==121 , set_flag(stepmode,on)   % check for a y (scan code 21)
+  (SM==`y , set_flag(stepmode,on)   % check for a y (scan code 21)
    ;
    set_flag(stepmode,off)),
   solve(X).                   % call solve w/ arity one with menu choice
@@ -198,7 +170,7 @@ solve(X):-
   T is cputime - T1,
   state(S),
   cube_print(S),
-  write("Done  time = "),
+  write($Done  time = $),
   write(T), nl, nl.
 solve(X):-
   error('failing to solve'),
@@ -257,9 +229,9 @@ build_plan([H|T]) :-
 % the heuristics for the stage
 
 init_stage(N,Plan):-         % return list of target pieces for this stage
+  wrfield(stage,N),
   cnd(N,Cands),              % set up candidate moves used by search
   build_cand(Cands),
-  wrfield(stage,N),
   vw(N,V),                   % set up preferred view for stage
   set_view(V),
   pln(N,Plan),!.             % get list of target pieces
@@ -295,7 +267,7 @@ imp(Stage,Pos,Piece):-
   set_view(View),
   crit(Crit),
   state(State),
-  %cntr_set(4,0),                                                % to limit wild searches
+  cntr_set(4,0),						% to limit wild searches
 %  gc(7),
   rotate(Moves,State,Crit),      % Search for moves which transform
   retract(state(_)),
@@ -446,7 +418,7 @@ col_p([PC|RestC],[P|Rest]):-
 
 random_cube(Cube):-
   ghoul(Start),
-  rand_cub(Start,Cube,500).
+  rand_cub(Start,Cube,50).
 
 rand_cub(Cube,Cube,0).
 rand_cub(Now,Cube,N):-
@@ -457,7 +429,7 @@ rand_cub(Now,Cube,N):-
   !,rand_cub(Next,Cube,NN).
 
 rand_move(M,RN):-
-  RN is integer(random(12)),
+  RN is integer(random*12),
   arg(RN,m(+f,+b,+r,+l,+u,+d,-f,-b,-r,-l,-u,-d),M).
 
 % the classic
@@ -550,29 +522,20 @@ build_cands([]):- !.
 build_cands([V1|V2]):-
   can_seq(V1),
   assertz(cand(V1)),
-  %pristine(G),                            % Start with the goal state
-  %movep(V1,G,S),
-  %wrfield(seq,V1),
-  %cube_print(S),
   !,build_cands(V2).
 
 can_seq(M):-                      % if the search move is a sequence
   seq(M,S),                       % precompute it, so it isn't constantly
   variable(X),                    % redone during search.
   move_list(S,X,Y),
-  assertz(candmove(m(M,X,Y))),
-  %pristine(G),                            % Start with the goal state
-  %movep(M,G,S),
-  %wrfield(seq,M),
-  %cube_print(S),
-  !.
+  assertz(candmove(m(M,X,Y))), !.
 can_seq(_).
 
 % another classic
 
-/*append([], V1, V1).
+append([], V1, V1).
 append([V1|V2], V3, [V1|V4]):-
-  append(V2, V3, V4). */
+  append(V2, V3, V4).
 
 % apply a list of moves to a state
 
@@ -597,7 +560,7 @@ movep(M, X, Y):- candmove(m(M,X,V3)), !, Y = V3.
 movep(V1, V2, V3):-
   seq(V1, V4), !,
   move_list(V4, V2, V3),!.
-%movep([V1|V2], V3, V4):- move_list([V1|V2], V3, V4),!.
+movep([V1|V2], V3, V4):- move_list([V1|V2], V3, V4),!.
 
 % same as move_list, only print new state when done
 
@@ -684,7 +647,7 @@ smember(X,Y):-
 
 error(X):-
   wrfield(error,X), nl,
-  get_single_char(_).
+  get1(_).
 
 % reverse a list of moves, and flip the signs along the way
 
