@@ -3,9 +3,9 @@
 % rules of the birds.pro into clam syntax.
 
 main :-
-        write('From file: '), read(From),
-        write('To file: '), read(To),
-        doit(From,To).
+        write('From file: '),
+        write('To file: '),
+        doit('birds.ckb','birds.txt').
 
 doit(From,To) :-
         see(From),
@@ -13,7 +13,6 @@ doit(From,To) :-
         test.
 
 test :- 
-        cntr_set(1,1),
         repeat,
         read(X),
         tran(X,Ans,[]),
@@ -33,8 +32,8 @@ tran(X,X,_).
 trans('!EOF','!EOF',_).
 
 trans((Head :- true)) --> {Head =.. [F,A]}, [F,is,A], !.
-trans((Head :- Body)) --> {cntr_get(1,ID)}, [rule, ID],
-        xxif(Body), xxthen(Head), {ID2 is ID + 1, cntr_set(1,ID2)}.
+trans((Head :- Body)) --> [rule, ID],
+        xxif(Body), xxthen(Head).
 
 write_nice(X) :- wr_nice(X), !.
 

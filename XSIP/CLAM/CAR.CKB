@@ -50,6 +50,5 @@ prompt 'Do you smell gas?'.
 
 ask	gas_gauge
 menu	(empty low full)
-prompt 'What does the gas gauge say?'.                                                                                                                      
-
-
+prompt 'What does the gas gauge say?'.
+                                                                                                                      

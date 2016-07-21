@@ -8,6 +8,17 @@
 
 % NOTE - CF calculation in update only good for positive CF
 
+:-dynamic
+    ruletrace/0,
+    fact/3,
+    asked/1,
+    rule/1,
+    multivalued/1,
+    askable/1,
+    ghoul/1.
+
+:- set_prolog_flag(unknown, warning).
+
 main :-
         do_over,
         super.
@@ -374,9 +385,10 @@ list_facts :-
 list_facts :-true.
 
 do_over :-
+        %retractall(asked),
+        %retractall(fact).
         abolish(asked,1),
         abolish(fact,3).
-
 clear :-
         abolish(asked,1),
         abolish(fact,3),
@@ -384,7 +396,13 @@ clear :-
         abolish(multivalued,1),
         abolish(askable,1),
         abolish(ghoul,1).
-        
+        %retractall(asked),
+        %retractall(fact),
+        %retractall(rule),
+        %retractall(multivalued),
+        %retractall(askable),
+        %retractall(ghoul).
+
 blank_lines(0).
 blank_lines(N) :-
         nl,
@@ -422,8 +440,8 @@ member(X,[Y|Z]) :- member(X,Z).
 
 load_rules :-
         write('Enter file name in single quotes (ex. ''car.ckb''.): '),
-        read(F),
-        load_rules(F).
+        %read(F),
+        load_rules('car.ckb').
 
 load_rules(F) :-
         clear_db,
@@ -437,9 +455,9 @@ lod_ruls :-
         read_sentence(L),
 %       bug(L),
         process(L),
-        L == ['!EOF'].
+        L == [-1].
 
-process(['!EOF']) :- !.
+    process([-1]) :- !.
 process(L) :-
         trans(R,L,[]),
         bug(R),
@@ -521,7 +539,7 @@ plist([Htext|Ttext]) --> [Htext],plist(Ttext).
 
 read_line(L) :- read_word_list([13,10], L), !.
 
-read_sentence(S) :- read_word_list([`.`], S), !.
+read_sentence(S) :- read_word_list([0'.], S), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% From the Cogent Prolog Toolbox
@@ -547,24 +565,24 @@ read_word_list(LW,[W|Ws]) :-
         readword(C, W, C1),        % Read word starting with C, C1 is first new
         restsent(LW, C1, Ws).      % character - use it to get rest of sentence
 
-restsent(_, '!EOF', []).
+    restsent(_, -1, []).
 restsent(LW,C,[]) :-                                 % Nothing left if hit last-word marker
         member(C,LW), !.
 restsent(LW,C,[W1|Ws]) :-
         readword(C,W1,C1),         % Else read next word and rest of sentence
         restsent(LW,C1,Ws).
 
-readword('!EOF','!EOF','!EOF').
-readword(96,W,C2) :-               % allow Prolog style comments
+    readword(-1,-1,-1).
+readword(0'%,W,C2) :-               % allow Prolog style comments
         !,
         skip(13),
         get0(C1),
         readword(C1,W,C2).
-readword(39,W,C2) :-
+readword(0'',W,C2) :-
         !,
         get0(C1),
         to_next_quote(C1,Cs),
-        name(W, [`'`|Cs]),
+        name(W, [0''|Cs]),
         get0(C2).        
 readword(C,W,C1) :-                % Some words are single characters
         single_char(C),            % i.e. punctuation
@@ -590,25 +608,25 @@ restword(C, [NewC|Cs], C2) :-
         restword(C1, Cs, C2).
 restword(C, [], C).
 
-to_next_quote(`'`, [`'`]).
+to_next_quote(0'', [0'']).
 to_next_quote(C,[C|Rest]) :-
         get0(C1),
         to_next_quote(C1,Rest).
 
-single_char(`,`).
-single_char(`;`).
-single_char(`:`).
-single_char(`?`).
-single_char(`!`).
-single_char(`.`).
-single_char(`(`).
-single_char(`)`).
+single_char(0',).
+single_char(0';).
+single_char(0':).
+single_char(0'?).
+single_char(0'!).
+single_char(0'.).
+single_char(0'().
+single_char(0')).
 
 
-in_word(C, C) :- C >= `a`, C =< `z`.
-in_word(C, C) :- C >= `A`, C =< `Z`.
-in_word(`-`, `-`).
-in_word(`_`, `_`).
+in_word(C, C) :- C >= 0'a, C =< 0'z.
+in_word(C, C) :- C >= 0'A, C =< 0'Z.
+in_word(0'-, 0'-).
+in_word(0'_, 0'_).
 
 % Have character C (known integer) - keep reading integers and build
 % up the number until we hit a non-integer. Return this in C1,
@@ -620,19 +638,19 @@ number_word(C, W, C1, Pow10) :-
         get0(C2),
         number_word(C2, W1, C1, P10),
         Pow10 is P10 * 10,
-        W is integer(((C - `0`) * Pow10) + W1).
+        W is integer(((C - 0'0) * Pow10) + W1).
 number_word(C, 0, C, 0.1).
 
 
 is_num(C) :-
-        C =< `9`,
-        C >= `0`.
+        C =< 0'9,
+        C >= 0'0.
 
 % These symbols delineate end of sentence
 
-%lastword(`.).
-%lastword(`!).
-%lastword(`?).
+%lastword(0'.).
+%lastword(0'!).
+%lastword(0'?).
 %lastword(13).          % carriage return
 %lastword(10).          % line feed
 
