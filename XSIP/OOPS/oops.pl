@@ -12,32 +12,34 @@
 :-op(500,xfy,:).            % used to separate attributes and values
 :-op(810,fx,rule).          % used to define rule
 :-op(700,xfy,#).            % used for unification instead of =
+:- set_prolog_flag(unknown, warning).
 
 main :- welcome, supervisor.
 
 welcome  :-
-	nl,nl,
-	write($         OOPS - A Toy Production System$),nl,nl,
-	write($This is an interpreter for files containing rules coded in the$),nl,
-	write($OOPS format.$),nl,nl,
-	write($The => prompt accepts three commands:$),nl,nl,
-	write($   load. -  prompts for name of rules file$),nl,
-	write($            enclose in single quotes$),nl,
-	write($   list. -  lists working memory$),nl,
-	write($   go.   -  starts the inference$),nl,
-	write($   exit. -  does what you'd expect$),nl,nl.
+        nl,nl,
+        write('         OOPS - A Toy Production System'),nl,nl,
+        write('This is an interpreter for files containing rules coded in the'),nl,
+        write('OOPS format.'),nl,nl,
+        write('The => prompt accepts three commands:'),nl,nl,
+        write('   load. -  prompts for name of rules file'),nl,
+        write('            enclose in single quotes'),nl,
+        write('   list. -  lists working memory'),nl,
+        write('   go.   -  starts the inference'),nl,
+        write('   exit. -  does what you''d expect'),nl,nl.
 
 % the supervisor, uses a repeat fail loop to read and process commands
 % from the user
 
 supervisor :-
-	repeat,
-	write('=>'),
-	read(X),
+        doit(load),
+        repeat,
+        write('=>'),
+        read(X),
 %  write(echo1-X),
-	doit(X),
+        doit(X),
 %  write(echo2-X),
-	X = exit.
+        X = exit.
 
 doit(X) :- do(X).
 
@@ -53,67 +55,67 @@ do(_) :- write('invalid command').
 % loads the rules (Prolog terms) into the Prolog database
 
 load :-
-	write('Enter file name in single quotes (ex. ''room.okb''.): '),
-	read(F),
-	reconsult(F).            % loads a rule file into interpreter work space
+        write('Enter file name in single quotes (ex. ''room.okb''.): '),
+        %read(F),
+        reconsult('room.okb').            % loads a rule file into interpreter work space
 
 % assert each of the initial conditions into working storage
 
 initialize :-
-	initial_data(X),
-	assert_list(X).
+        initial_data(X),
+        assert_list(X).
 
 % working storage is represented by database terms stored
 % under the key "fact"
 
 assert_list([]) :- !.
 assert_list([H|T]) :-
-	assertz( fact(H) ),
-	!,assert_list(T).
+        assertz( fact(H) ),
+        !,assert_list(T).
 
 % the main inference loop, find a rule and try it.  if it fired, say so
 % and repeat the process.  if not go back and try the next rule.  when
 % no rules succeed, stop the inference
 
 go :-
-	call(rule ID: LHS ==> RHS),
-	try(LHS,RHS),
-	write('Rule fired '),write(ID),nl,
-	!,go.
+        call(rule ID: LHS ==> RHS),
+        try(LHS,RHS),
+        write('Rule fired '),write(ID),nl,
+        !,go.
 go.
 
 % find the current conflict set.
 
 %conflict_set(CS) :-
-%	bagof(rule ID: LHS ==> RHS,
-%		[rule ID: LHS ==> RHS, match(LHS)],CS).
+%       bagof(rule ID: LHS ==> RHS,
+%               [rule ID: LHS ==> RHS, match(LHS)],CS).
 
 % match the LHS against working storage, if it succeeds process the
 % actions from the RHS
 
 try(LHS,RHS) :-
-	match(LHS),
-	process(RHS,LHS),!.
+        match(LHS),
+        process(RHS,LHS),!.
 
 % recursively go through the LHS list, matching conditions against
 % working storage
 
 match([]) :- !.
 match([N:Prem|Rest]) :-
-	!,
-	(fact(Prem);
-	 test(Prem)),          % a comparison test rather than a fact
-	match(Rest).
+        !,
+        (fact(Prem);
+         test(Prem)),          % a comparison test rather than a fact
+        match(Rest).
 match([Prem|Rest]) :-
-	(fact(Prem);    % condition number not specified
-	 test(Prem)),
-	match(Rest).
+        (fact(Prem);    % condition number not specified
+         test(Prem)),
+        match(Rest).
 
 % various tests allowed on the LHS
 
 test(not(X)) :-
-	fact(X),
-	!,fail.
+        fact(X),
+        !,fail.
 test(not(X)) :- !.
 test(X#Y) :- X=Y,!.
 test(X>Y) :- X>Y,!.
@@ -127,15 +129,15 @@ test(member(X,Y)) :- member(X,Y),!.
 
 process([],_) :- !.
 process([Action|Rest],LHS) :-
-	take(Action,LHS),
-	!,process(Rest,LHS).
+        take(Action,LHS),
+        !,process(Rest,LHS).
 
 % if its retract, use the reference numbers stored in the Lrefs list,
 % otherwise just take the action
 
 take(retract(N),LHS) :-
-	(N == all; integer(N)),
-	retr(N,LHS),!.
+        (N == all; integer(N)),
+        retr(N,LHS),!.
 take(A,_) :-take(A),!.
 
 take(retract(X)) :- retract(fact(X)), !.
@@ -158,33 +160,31 @@ retr(N,[_|Rest]) :- !,retr(N,Rest).
 
 retrall([]).
 retrall([N:Prem|Rest]) :-
-	retract(fact(Prem)),
-	!, retrall(Rest).
+        retract(fact(Prem)),
+        !, retrall(Rest).
 retrall([Prem|Rest]) :-
-	retract(fact(Prem)),
-	!, retrall(Rest).
-retrall([_|Rest]) :-		% must have been a test
-	retrall(Rest).
+        retract(fact(Prem)),
+        !, retrall(Rest).
+retrall([_|Rest]) :-            % must have been a test
+        retrall(Rest).
 
 % list all of the terms in working storage
 
 lst :-
-	fact(X),
-	write(X),nl,
-	fail.
+        fact(X),
+        write(X),nl,
+        fail.
 lst :- !.
 
 % lists all of the terms which match the pattern
 
 lst(X) :-
-	fact(X),
-	write(X),nl,
-	fail.
+        fact(X),
+        write(X),nl,
+        fail.
 lst(_) :- !.
 
 % utilities
 
 member(X,[X|Y]).
 member(X,[Y|Z]) :- member(X,Z).
-
-
